@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindPath - Trắc nghiệm Tính cách & Hướng nghiệp</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+              950: '#082f49',
+            },
+            accent: {
+              400: '#22d3ee',
+              500: '#06b6d4',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'fade-up': 'fadeUp 0.6s ease-out forwards',
+            'slide-in-right': 'slideInRight 0.4s ease-out',
+            'slide-out-left': 'slideOutLeft 0.3s ease-in',
+            'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
+            'spin-slow': 'spin 3s linear infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-12px)' },
+            },
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(24px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            slideInRight: {
+              '0%': { opacity: '0', transform: 'translateX(40px)' },
+              '100%': { opacity: '1', transform: 'translateX(0)' },
+            },
+            slideOutLeft: {
+              '0%': { opacity: '1', transform: 'translateX(0)' },
+              '100%': { opacity: '0', transform: 'translateX(-40px)' },
+            },
+            pulseSoft: {
+              '0%, 100%': { opacity: '1' },
+              '50%': { opacity: '0.7' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .gradient-bg {
+      background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 40%, #0ea5e9 70%, #e0f2fe 100%);
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #0369a1, #0ea5e9, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .card-gradient-border {
+      position: relative;
+      background: white;
+      border-radius: 1.25rem;
+    }
+    .card-gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 1.25rem;
+      padding: 1.5px;
+      background: linear-gradient(135deg, #0ea5e9, #22d3ee, #7dd3fc);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .card-gradient-border:hover::before { opacity: 1; }
+    .soft-shadow {
+      box-shadow: 0 4px 24px -4px rgba(14, 165, 233, 0.12), 0 2px 8px -2px rgba(0,0,0,0.04);
+    }
+    .soft-shadow-lg {
+      box-shadow: 0 12px 40px -8px rgba(14, 165, 233, 0.18), 0 4px 16px -4px rgba(0,0,0,0.06);
+    }
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .progress-bar {
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .answer-btn {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .answer-btn.selected {
+      background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+      color: white;
+      border-color: transparent;
+      transform: scale(1.02);
+      box-shadow: 0 8px 24px -4px rgba(14, 165, 233, 0.4);
+    }
+    .answer-btn:hover:not(.selected) {
+      border-color: #0ea5e9;
+      background: #f0f9ff;
+      transform: translateY(-2px);
+    }
+    .header-blur {
+      backdrop-filter: blur(12px);
+      background: rgba(255,255,255,0.85);
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .stagger-1 { transition-delay: 0.1s; }
+    .stagger-2 { transition-delay: 0.2s; }
+    .stagger-3 { transition-delay: 0.3s; }
+    .stagger-4 { transition-delay: 0.4s; }
+    .stagger-5 { transition-delay: 0.5s; }
+    /* Quiz transition */
+    .question-enter {
+      animation: slideInRight 0.4s ease-out forwards;
+    }
+    .question-exit {
+      animation: slideOutLeft 0.3s ease-in forwards;
+    }
+    /* Modal */
+    .modal-overlay {
+      background: rgba(8, 47, 73, 0.6);
+      backdrop-filter: blur(8px);
+    }
+    .modal-content {
+      animation: modalIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    /* Loading circle */
+    .loading-ring {
+      border: 4px solid #e0f2fe;
+      border-top-color: #0ea5e9;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    /* Radial progress */
+    .radial-chart {
+      transform: rotate(-90deg);
+    }
+    /* Hide scrollbar for some elements */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+  <!-- HEADER -->
+  <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 md:h-18">
+        <a href="#" onclick="showPage('home')" class="flex items-center gap-2 group">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-600 to-accent-500 flex items-center justify-center text-white font-bold text-lg shadow-md group-hover:scale-105 transition-transform">
+            M
+          </div>
+          <span class="font-bold text-xl text-primary-900 tracking-tight">MindPath</span>
+        </a>
+        <nav class="hidden md:flex items-center gap-8">
+          <a href="#" onclick="showPage('home')" class="nav-link text-sm font-medium text-slate-600 hover:text-primary-600 transition-colors">Trang chủ</a>
+          <a href="#" onclick="showPage('tests')" class="nav-link text-sm font-medium text-slate-600 hover:text-primary-600 transition-colors">Trắc nghiệm</a>
+          <a href="#" onclick="showPage('types')" class="nav-link text-sm font-medium text-slate-600 hover:text-primary-600 transition-colors">Nhóm tính cách</a>
+          <a href="#" onclick="showPage('career')" class="nav-link text-sm font-medium text-slate-600 hover:text-primary-600 transition-colors">Hướng nghiệp</a>
+          <a href="#about" class="nav-link text-sm font-medium text-slate-600 hover:text-primary-600 transition-colors">Giới thiệu</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <button onclick="showPage('tests')" class="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary-600 to-primary-500 text-white text-sm font-semibold shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all">
+            Làm trắc nghiệm
+          </button>
+          <button id="menuBtn" class="md:hidden p-2 rounded-lg hover:bg-slate-100" onclick="toggleMobileMenu()">
+            <i data-lucide="menu" class="w-6 h-6 text-slate-700"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="hidden md:hidden border-t border-slate-100 bg-white">
+      <div class="px-4 py-3 space-y-1">
+        <a href="#" onclick="showPage('home'); toggleMobileMenu()" class="block px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-primary-50 hover:text-primary-600">Trang chủ</a>
+        <a href="#" onclick="showPage('tests'); toggleMobileMenu()" class="block px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-primary-50 hover:text-primary-600">Trắc nghiệm</a>
+        <a href="#" onclick="showPage('types'); toggleMobileMenu()" class="block px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-primary-50 hover:text-primary-600">Nhóm tính cách</a>
+        <a href="#" onclick="showPage('career'); toggleMobileMenu()" class="block px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-primary-50 hover:text-primary-600">Hướng nghiệp</a>
+        <a href="#about" onclick="toggleMobileMenu()" class="block px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-primary-50 hover:text-primary-600">Giới thiệu</a>
+        <button onclick="showPage('tests'); toggleMobileMenu()" class="w-full mt-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-primary-600 to-primary-500 text-white text-sm font-semibold">
+          Làm trắc nghiệm
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="app" class="min-h-screen">
+    <!-- Pages will be injected here -->
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-primary-950 text-slate-300 pt-16 pb-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+        <div class="md:col-span-1">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-accent-400 flex items-center justify-center text-white font-bold">M</div>
+            <span class="font-bold text-xl text-white">MindPath</span>
+          </div>
+          <p class="text-sm text-slate-400 leading-relaxed">Nền tảng trắc nghiệm tính cách và hướng nghiệp hiện đại, giúp bạn hiểu bản thân và chọn đúng hướng đi.</p>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white mb-4">Trắc nghiệm</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" onclick="showPage('tests')" class="hover:text-primary-300 transition-colors">RIASEC</a></li>
+            <li><a href="#" onclick="showPage('tests')" class="hover:text-primary-300 transition-colors">Big Five</a></li>
+            <li><a href="#" onclick="showPage('tests')" class="hover:text-primary-300 transition-colors">MBTI</a></li>
+            <li><a href="#" onclick="showPage('tests')" class="hover:text-primary-300 transition-colors">Sở thích nghề nghiệp</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white mb-4">Khám phá</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" onclick="showPage('types')" class="hover:text-primary-300 transition-colors">16 nhóm tính cách</a></li>
+            <li><a href="#" onclick="showPage('career')" class="hover:text-primary-300 transition-colors">Hướng nghiệp</a></li>
+            <li><a href="#about" class="hover:text-primary-300 transition-colors">Giới thiệu</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white mb-4">Liên hệ</h4>
+          <ul class="space-y-2 text-sm">
+            <li class="flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4"></i> hello@mindpath.vn</li>
+            <li class="flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4"></i> 1900 1234</li>
+          </ul>
+          <div class="flex gap-3 mt-4">
+            <a href="#" class="w-9 h-9 rounded-full bg-primary-800 hover:bg-primary-700 flex items-center justify-center transition-colors"><i data-lucide="facebook" class="w-4 h-4"></i></a>
+            <a href="#" class="w-9 h-9 rounded-full bg-primary-800 hover:bg-primary-700 flex items-center justify-center transition-colors"><i data-lucide="instagram" class="w-4 h-4"></i></a>
+            <a href="#" class="w-9 h-9 rounded-full bg-primary-800 hover:bg-primary-700 flex items-center justify-center transition-colors"><i data-lucide="youtube" class="w-4 h-4"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-primary-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-slate-500">
+        <p>© 2026 MindPath. Tất cả quyền được bảo lưu.</p>
+        <div class="flex gap-6">
+          <a href="#" class="hover:text-slate-300">Chính sách bảo mật</a>
+          <a href="#" class="hover:text-slate-300">Điều khoản sử dụng</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL -->
+  <div id="modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="modal-overlay absolute inset-0" onclick="closeModal()"></div>
+    <div id="modalContent" class="modal-content relative bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto soft-shadow-lg"></div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Init lucide icons
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initApp();
+    });
+  </script>
+</body>
+</html>
